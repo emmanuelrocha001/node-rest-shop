@@ -1,12 +1,30 @@
 const express = require('express');
 const app = express();
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
 
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
 
-
+//request logger
 app.use(morgan('dev'));
+//extract json and urlencoded data
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
+// preventing cors errors
+app.use((req, res, next) => {
+  // deals with cors, gives access to any client
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-requested-Width, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', 'PUT, POST, PATCH', 'DELETE, GET');
+    return res.status(200).json({});
+  }
+
+  // so other routes can take over
+  next();
+});
 
 // sets up middleware
 // urls with /products will be forwarded
