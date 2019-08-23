@@ -9,10 +9,11 @@ const orderRoutes = require('./api/routes/orders');
 
 //connect database
 mongoose.connect('mongodb+srv://node-shop:' + process.env.MONGO_ATLAST_PW + '@node-rest-shop-tpsj7.mongodb.net/test?retryWrites=true&w=majority',
- {
-    useMongoClient: true
- }
+{
+  useNewUrlParser: true
+}
  );
+ mongoose.Promise = global.Promise;
 
 //request logger
 app.use(morgan('dev'));
