@@ -2,9 +2,17 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
+
+//connect database
+mongoose.connect('mongodb+srv://node-shop:' + process.env.MONGO_ATLAST_PW + '@node-rest-shop-tpsj7.mongodb.net/test?retryWrites=true&w=majority',
+ {
+    useMongoClient: true
+ }
+ );
 
 //request logger
 app.use(morgan('dev'));
