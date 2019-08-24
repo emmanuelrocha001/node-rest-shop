@@ -13,7 +13,9 @@ mongoose.connect('mongodb+srv://node-shop:' + process.env.MONGO_ATLAST_PW + '@no
   useNewUrlParser: true
 }
  );
- mongoose.Promise = global.Promise;
+
+// Use default node.js promise implementation 
+mongoose.Promise = global.Promise;
 
 //request logger
 app.use(morgan('dev'));
