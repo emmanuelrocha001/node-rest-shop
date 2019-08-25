@@ -3,7 +3,7 @@ const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-
+const path = require('path');
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
 
@@ -17,6 +17,10 @@ mongoose.connect('mongodb+srv://node-shop:' + process.env.MONGO_ATLAST_PW + '@no
 // Use default node.js promise implementation 
 mongoose.Promise = global.Promise;
 
+// makes folder public available
+// app.use('/uploads', express.static('uploads'));
+// var dirname = path.join(__dirname, '/uploads/')
+app.use(express.static(__dirname));
 //request logger
 app.use(morgan('dev'));
 //extract json and urlencoded data

@@ -2,13 +2,52 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Product = require('../models/product');
+const multer = require('multer');
+const path = require('path');
+
+const storage  = multer.diskStorage({
+  destination: function(req, file, cb) {
+    // path.join(__dirname, '/uploads/')
+    cb(null, './uploads/');
+  },
+  // filename: function(req, file, cb) { 
+  //   cb(null, new Date().toISOString() + file.originalname);
+  // }
+  filename: function(req, file, cb){ 
+    const now = new Date().toISOString(); 
+    const date = now.replace(/:/g, '-'); 
+    cb(null, date + file.originalname); 
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+    // accept file
+    cb(null, true)
+  }
+  else {
+    // reject a file
+    cb(null, false);
+  }
+
+}
+
+// intialize and stores files in this directory
+// not having leading / turns path into relative path
+const upload = multer({
+  storage: storage, 
+  limits: {
+    fileSize: 1024 * 1024 * 5
+  },
+  fileFilter: fileFilter
+}); 
 
 router.get('/', (req, res, next) => {
   
     // select fetches only specified fields
     // map() maps to new array
     Product.find()
-    .select('name price _id')
+    .select('name price _id productImage')
     .exec()
     .then(docs => {
       const response = {
@@ -17,6 +56,7 @@ router.get('/', (req, res, next) => {
           return {
             name: doc.name,
             price: doc.price,
+            productImage: doc.productImage,
             _id: doc._id,
             request: {
               type: 'GET',
@@ -43,13 +83,18 @@ router.get('/', (req, res, next) => {
     });
   });
 
-
-router.post('/', (req, res, next) => {
+//multer gives extra middleware
+//change to multi part form data
+router.post('/', upload.single('productImage'), (req, res, next) => {
+  //available due to multer middleware being executed first
+  //header is set automatically when form data is chosen
+  console.log(req.file);
 
   const product = new Product({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
-    price: req.body.price
+    price: req.body.price,
+    productImage: req.file.path
   });
 
   // save mongoose models to database
@@ -62,6 +107,7 @@ router.post('/', (req, res, next) => {
         createdProduct: {
           name: result.name,
           price: result.price,
+          productImage: productImage,
           _id: result._id,
           request: {
             type: 'GET',
@@ -81,7 +127,7 @@ router.get('/:productId', (req, res, next) => {
   const id = req.params.productId;
 
   Product.findById(id)
-  .select('name price _id')
+  .select('name price _id productImage')
   .exec()
   .then(doc => {
     if (doc) {
