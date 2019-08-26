@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 // design object
-// unique optimises to be searched and indexed and performance optimization
+// unique optimizes searching and indexing, aswell as performance
 const userSchema = mongoose.Schema({
   _id: mongoose.Schema.Types.ObjectId,
   email: { 
