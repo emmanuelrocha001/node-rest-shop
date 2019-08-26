@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const Product = require('../models/product');
 const multer = require('multer');
 const path = require('path');
+const checkAuth = require('../middleware/check-auth');
 
 const storage  = multer.diskStorage({
   destination: function(req, file, cb) {
@@ -85,7 +86,7 @@ router.get('/', (req, res, next) => {
 
 //multer gives extra middleware
 //change to multi part form data
-router.post('/', upload.single('productImage'), (req, res, next) => {
+router.post('/', checkAuth, upload.single('productImage'), (req, res, next) => {
   //available due to multer middleware being executed first
   //header is set automatically when form data is chosen
   console.log(req.file);
@@ -107,7 +108,7 @@ router.post('/', upload.single('productImage'), (req, res, next) => {
         createdProduct: {
           name: result.name,
           price: result.price,
-          productImage: productImage,
+          productImage: result.productImage,
           _id: result._id,
           request: {
             type: 'GET',
@@ -151,7 +152,7 @@ router.get('/:productId', (req, res, next) => {
   });
 });
 
-router.patch('/:productId', (req, res, next) => {
+router.patch('/:productId', checkAuth, (req, res, next) => {
   const id = req.params.productId;
   const updateOps = {};
   for (const ops of req.body) {
@@ -180,7 +181,7 @@ router.patch('/:productId', (req, res, next) => {
 
 });
 
-router.delete('/:productId', (req, res, next) => {
+router.delete('/:productId', checkAuth, (req, res, next) => {
   const id = req.params.productId;
   Product.remove({_id: id})
   .exec()
